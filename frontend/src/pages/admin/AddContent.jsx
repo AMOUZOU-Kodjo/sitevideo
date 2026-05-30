@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { contentAPI } from '../../services/api';
 import toast from 'react-hot-toast';
-import { FiSave, FiArrowLeft } from 'react-icons/fi';
+import { FiSave, FiArrowLeft, FiImage } from 'react-icons/fi';
 
 export default function AddContent() {
   const { id } = useParams();
@@ -19,9 +19,12 @@ export default function AddContent() {
     category_id: ''
   });
   const [file, setFile] = useState(null);
+  const [thumbFile, setThumbFile] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEdit);
+  const [thumbPreview, setThumbPreview] = useState(null);
+  const [generatingThumb, setGeneratingThumb] = useState(false);
 
   useEffect(() => {
     contentAPI.getCategories().then((res) => setCategories(res.data)).catch(() => {});
@@ -50,6 +53,42 @@ export default function AddContent() {
     setForm({ ...form, [e.target.name]: val });
   };
 
+  const generatePdfThumbnail = async (pdfFile) => {
+    if (pdfFile.type !== 'application/pdf') return;
+    setGeneratingThumb(true);
+    try {
+      const pdfjs = await import('pdfjs-dist');
+      pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).href;
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 0.5 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.7));
+      const thumb = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
+      setThumbFile(thumb);
+      setThumbPreview(URL.createObjectURL(thumb));
+    } catch (e) {
+      console.warn('Thumbnail generation failed:', e);
+      setThumbFile(null);
+      setThumbPreview(null);
+    } finally {
+      setGeneratingThumb(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const f = e.target.files[0];
+    setFile(f);
+    setThumbFile(null);
+    setThumbPreview(null);
+    if (f && f.type === 'application/pdf') generatePdfThumbnail(f);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title) { toast.error('Le titre est requis.'); return; }
@@ -68,6 +107,7 @@ export default function AddContent() {
       formData.append('youtube_id', form.youtube_id);
       if (form.category_id) formData.append('category_id', form.category_id);
       if (file) formData.append('file', file);
+      if (thumbFile) formData.append('thumbnail', thumbFile);
 
       if (isEdit) {
         await contentAPI.update(id, formData);
@@ -146,7 +186,14 @@ export default function AddContent() {
           {(form.type === 'document' || form.type === 'audio') && (
             <div className="form-control">
               <label className="label"><span className="label-text font-medium">Fichier {isEdit ? '(laisser vide pour conserver)' : '*'}</span></label>
-              <input type="file" className="file-input file-input-bordered w-full" accept={form.type === 'document' ? '.pdf,.doc,.docx,.epub' : '.mp3,.wav,.ogg,.m4a'} onChange={(e) => setFile(e.target.files[0])} />
+              <input type="file" className="file-input file-input-bordered w-full" accept={form.type === 'document' ? '.pdf,.doc,.docx,.epub' : '.mp3,.wav,.ogg,.m4a'} onChange={handleFileChange} />
+              {generatingThumb && <span className="label"><span className="label-text-alt">Génération de l'aperçu...</span></span>}
+              {thumbPreview && (
+                <div className="mt-2 flex items-center gap-3">
+                  <img src={thumbPreview} alt="Aperçu PDF" className="w-20 h-28 object-cover rounded border" />
+                  <span className="text-xs opacity-60"><FiImage className="inline" /> Aperçu généré</span>
+                </div>
+              )}
             </div>
           )}
 

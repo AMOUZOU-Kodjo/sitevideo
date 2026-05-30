@@ -3,7 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import { contentAPI, purchaseAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { FiPlay, FiFileText, FiMusic, FiLock, FiUnlock, FiDownload, FiArrowLeft, FiEye, FiAlertTriangle, FiYoutube } from 'react-icons/fi';
+import { FiPlay, FiFileText, FiMusic, FiLock, FiUnlock, FiDownload, FiArrowLeft, FiEye, FiAlertTriangle, FiYoutube, FiBookOpen } from 'react-icons/fi';
+
+const BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+const toAbsUrl = (url) => url?.startsWith('http') ? url : `${BASE_URL}${url}`;
 
 export default function ContentDetail() {
   const { id } = useParams();
@@ -12,6 +15,7 @@ export default function ContentDetail() {
   const [hasAccess, setHasAccess] = useState(false);
   const [loading, setLoading] = useState(true);
   const [embedError, setEmbedError] = useState(false);
+  const [showReader, setShowReader] = useState(false);
   const playerRef = useRef(null);
 
   useEffect(() => {
@@ -37,7 +41,7 @@ export default function ContentDetail() {
   };
 
   const scrollToPlayer = () => {
-    playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
   };
 
   if (loading) return <div className="flex justify-center py-20"><span className="loading loading-spinner loading-lg text-primary"></span></div>;
@@ -46,6 +50,13 @@ export default function ContentDetail() {
   const typeIcons = { video: FiPlay, document: FiFileText, audio: FiMusic };
   const Icon = typeIcons[content.type] || FiPlay;
   const canAccess = hasAccess || content.status === 'free';
+  const fileUrl = content.file_url ? toAbsUrl(content.file_url) : null;
+
+  const handleRead = (e) => {
+    if (!canAccess) { handlePurchase(); return; }
+    setShowReader(true);
+    scrollToPlayer();
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
@@ -68,7 +79,7 @@ export default function ContentDetail() {
               </>
             ) : (
               <div className="aspect-video rounded-xl overflow-hidden shadow-lg bg-base-300 relative flex items-center justify-center">
-                <div className="absolute inset-0 backdrop-blur-sm bg-base-300/70 flex flex-col items-center justify-center gap-4 p-8 text-center">
+                <div className="absolute inset-0 backdrop-blur-sm bg-base-300/70 flex flex-col items-center justify-center gap-4 p-8 text-center z-10">
                   <FiLock className="text-5xl text-warning" />
                   <h3 className="text-xl font-bold">Contenu Premium</h3>
                   <p className="opacity-70">Achetez ce contenu pour y accéder</p>
@@ -79,16 +90,52 @@ export default function ContentDetail() {
                 <img src={`https://img.youtube.com/vi/${content.youtube_id}/maxresdefault.jpg`} alt="" className="w-full h-full object-cover opacity-30" onError={(e) => { e.target.style.display = 'none'; }} />
               </div>
             )
+          ) : content.type === 'document' && fileUrl ? (
+            <>
+              {showReader ? (
+                <div className="rounded-xl overflow-hidden shadow-lg bg-base-200" style={{ height: '80vh' }}>
+                  <div className="flex items-center justify-between px-4 py-2 bg-base-300">
+                    <span className="font-medium text-sm truncate">{content.title}</span>
+                    <button onClick={() => setShowReader(false)} className="btn btn-ghost btn-xs">Fermer</button>
+                  </div>
+                  <embed src={fileUrl} type="application/pdf" className="w-full h-[calc(80vh-40px)]" />
+                </div>
+              ) : (
+                <div className={`rounded-xl overflow-hidden shadow-lg relative`} style={{ height: '70vh' }}>
+                  <embed src={fileUrl} type="application/pdf" className="w-full h-full pointer-events-none" style={{ opacity: 0.4 }} />
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                    <div className="text-center max-w-sm">
+                      {canAccess ? (
+                        <button onClick={handleRead} className="btn btn-primary btn-lg gap-3 shadow-xl">
+                          <FiBookOpen className="text-xl" /> Lire le document
+                        </button>
+                      ) : (
+                        <div className="flex flex-col items-center gap-4">
+                          <div className="bg-base-100/90 backdrop-blur rounded-2xl p-8 shadow-xl">
+                            <FiLock className="text-5xl text-warning mx-auto mb-3" />
+                            <h3 className="text-xl font-bold mb-1">Document Premium</h3>
+                            <p className="opacity-70 mb-4">Achetez pour lire et télécharger</p>
+                            <button onClick={handlePurchase} className="btn btn-warning gap-2">
+                              <FiLock /> Acheter pour {content.price}€
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           ) : content.type === 'audio' ? (
             canAccess ? (
               <div className="rounded-xl bg-base-200 p-8">
-                <audio controls className="w-full" src={content.file_url ? `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${content.file_url}` : undefined}>
+                <audio controls className="w-full" src={fileUrl || undefined}>
                   Votre navigateur ne supporte pas le lecteur audio.
                 </audio>
               </div>
             ) : (
               <div className="h-64 rounded-xl bg-base-300 relative flex items-center justify-center">
-                <div className="absolute inset-0 backdrop-blur-sm bg-base-300/70 flex flex-col items-center justify-center gap-4 p-8 text-center">
+                <div className="absolute inset-0 backdrop-blur-sm bg-base-300/70 flex flex-col items-center justify-center gap-4 p-8 text-center z-10">
                   <FiLock className="text-5xl text-warning" />
                   <h3 className="text-xl font-bold">Contenu Premium</h3>
                   <p className="opacity-70">Achetez ce contenu pour écouter</p>
@@ -128,7 +175,7 @@ export default function ContentDetail() {
                 <Icon className="text-3xl text-primary" />
                 <div>
                   <p className="font-bold text-lg">{content.type === 'video' ? 'Vidéo' : content.type === 'document' ? 'Document' : 'Audio'}</p>
-                  <p className="text-sm opacity-60">{content.type === 'video' ? 'Streaming YouTube' : content.type === 'document' ? 'Téléchargement PDF' : 'Streaming Audio'}</p>
+                  <p className="text-sm opacity-60">{content.type === 'video' ? 'Streaming YouTube' : content.type === 'document' ? 'Lecteur PDF' : 'Streaming Audio'}</p>
                 </div>
               </div>
 
@@ -152,23 +199,33 @@ export default function ContentDetail() {
                       </a>
                     </>
                   )}
+                  {content.type === 'document' && fileUrl && (
+                    <>
+                      <button onClick={handleRead} className="btn btn-primary w-full gap-2">
+                        <FiBookOpen /> Lire le document
+                      </button>
+                      <a href={fileUrl} download className="btn btn-outline w-full gap-2">
+                        <FiDownload /> Télécharger
+                      </a>
+                    </>
+                  )}
                   {content.type === 'audio' && (
                     <button onClick={scrollToPlayer} className="btn btn-primary w-full gap-2">
                       <FiPlay /> Écouter
                     </button>
                   )}
-                  {content.type !== 'video' && content.file_url && (
-                    <a href={`${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${content.file_url}`} target="_blank" className="btn btn-primary w-full gap-2" download>
-                      <FiDownload /> Télécharger
-                    </a>
-                  )}
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-sm opacity-70 mb-2">Ce contenu est payant. Achetez-le pour y accéder.</p>
+                  <p className="text-sm opacity-70 mb-2">Ce contenu est payant.</p>
                   <button onClick={handlePurchase} className="btn btn-warning w-full gap-2">
                     <FiLock /> Acheter pour {content.price}€
                   </button>
+                  {content.type === 'document' && (
+                    <button onClick={scrollToPlayer} className="btn btn-ghost btn-sm w-full gap-2">
+                      <FiBookOpen /> Voir l'aperçu
+                    </button>
+                  )}
                   {content.type === 'video' && content.youtube_id && (
                     <a href={`https://www.youtube.com/watch?v=${content.youtube_id}`} target="_blank" rel="noopener noreferrer" className="btn btn-ghost btn-sm w-full gap-2">
                       <FiYoutube /> Aperçu sur YouTube

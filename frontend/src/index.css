@@ -1,11 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   html { scroll-behavior: smooth; }
+  body { @apply antialiased; }
 }
 
 @layer components {
   .card-hover { @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1; }
+  .gradient-text { @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary; }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-base-300 rounded-full; }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover { @apply bg-base-content/30; }
 }

@@ -65,6 +65,7 @@ export default function AdminContents() {
           <table className="table table-zebra w-full">
             <thead>
               <tr>
+                <th></th>
                 <th>Titre</th>
                 <th>Type</th>
                 <th>Statut</th>
@@ -80,6 +81,15 @@ export default function AdminContents() {
                 const Icon = typeIcons[c.type] || FiPlay;
                 return (
                   <tr key={c.id}>
+                    <td>
+                      {c.thumbnail ? (
+                        <img src={c.thumbnail} alt="" className="w-10 h-14 object-cover rounded" />
+                      ) : c.type === 'video' && c.youtube_id ? (
+                        <img src={`https://img.youtube.com/vi/${c.youtube_id}/default.jpg`} alt="" className="w-10 h-14 object-cover rounded" loading="lazy" />
+                      ) : (
+                        <div className="w-10 h-14 rounded bg-base-200 flex items-center justify-center"><Icon className="opacity-30" /></div>
+                      )}
+                    </td>
                     <td className="font-medium max-w-xs truncate">{c.title}</td>
                     <td><span className={`badge badge-sm gap-1 ${typeColors[c.type] || 'badge-ghost'}`}><Icon /> {c.type}</span></td>
                     <td><span className={`badge badge-sm ${c.status === 'free' ? 'badge-success' : 'badge-warning'}`}>{c.status}</span></td>

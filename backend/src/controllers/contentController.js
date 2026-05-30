@@ -1,6 +1,5 @@
 const db = require('../config/database');
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('../config/cloudinary');
 
 exports.getAll = async (req, res, next) => {
   try {
@@ -84,15 +83,20 @@ exports.create = async (req, res, next) => {
     }
 
     let file_url = null;
-    if (req.file) {
-      file_url = `/uploads/${req.file.filename}`;
+    if (req.files?.file) {
+      file_url = req.files.file[0].path;
+    }
+
+    let thumbUrl = null;
+    if (req.files?.thumbnail) {
+      thumbUrl = req.files.thumbnail[0].path;
     }
 
     const result = await db.query(
-      `INSERT INTO contents (title, description, type, status, price, youtube_id, file_url, category_id, uploaded_by)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO contents (title, description, type, status, price, youtube_id, file_url, thumbnail, category_id, uploaded_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
-      [title, description, type, status || 'free', price || 0, youtube_id, file_url, category_id, req.user.id]
+      [title, description, type, status || 'free', price || 0, youtube_id, file_url, thumbUrl, category_id, req.user.id]
     );
 
     res.status(201).json(result.rows[0]);
@@ -120,13 +124,13 @@ exports.update = async (req, res, next) => {
     if (youtube_id !== undefined) { updates.push(`youtube_id = $${paramIndex++}`); values.push(youtube_id); }
     if (category_id !== undefined) { updates.push(`category_id = $${paramIndex++}`); values.push(category_id); }
     if (is_published !== undefined) { updates.push(`is_published = $${paramIndex++}`); values.push(is_published); }
-    if (req.file) {
-      if (existing.rows[0].file_url) {
-        const oldPath = path.join(__dirname, '../../', existing.rows[0].file_url);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      }
+    if (req.files?.thumbnail) {
+      updates.push(`thumbnail = $${paramIndex++}`);
+      values.push(req.files.thumbnail[0].path);
+    }
+    if (req.files?.file) {
       updates.push(`file_url = $${paramIndex++}`);
-      values.push(`/uploads/${req.file.filename}`);
+      values.push(req.files.file[0].path);
     }
 
     if (updates.length === 0) {
@@ -152,8 +156,16 @@ exports.remove = async (req, res, next) => {
     }
 
     if (result.rows[0].file_url) {
-      const filePath = path.join(__dirname, '../../', result.rows[0].file_url);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      try {
+        const publicId = result.rows[0].file_url.split('/upload/')[1]?.split('/').slice(1).join('/').replace(/\.[^.]+$/, '');
+        if (publicId) cloudinary.uploader.destroy(publicId, { resource_type: 'raw' }).catch(() => {});
+      } catch (e) { /* skip */ }
+    }
+    if (result.rows[0].thumbnail) {
+      try {
+        const publicId = result.rows[0].thumbnail.split('/upload/')[1]?.split('/').slice(1).join('/').replace(/\.[^.]+$/, '');
+        if (publicId) cloudinary.uploader.destroy(publicId).catch(() => {});
+      } catch (e) { /* skip */ }
     }
 
     await db.query('DELETE FROM contents WHERE id = $1', [req.params.id]);

@@ -8,8 +8,8 @@ router.get('/', contentController.getAll);
 router.get('/categories', contentController.getCategories);
 router.get('/:id', contentController.getById);
 
-router.post('/', authenticate, upload.single('file'), contentController.create);
-router.put('/:id', authenticate, upload.single('file'), contentController.update);
+router.post('/', authenticate, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'thumbnail', maxCount: 1 }]), contentController.create);
+router.put('/:id', authenticate, upload.fields([{ name: 'file', maxCount: 1 }, { name: 'thumbnail', maxCount: 1 }]), contentController.update);
 router.delete('/:id', authenticate, contentController.remove);
 
 module.exports = router;

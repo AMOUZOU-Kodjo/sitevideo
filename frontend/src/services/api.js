@@ -59,4 +59,8 @@ export const adminAPI = {
   deleteCategory: (id) => api.delete(`/admin/categories/${id}`)
 };
 
+export const youtubeAPI = {
+  getLatest: (limit) => api.get('/youtube/latest', { params: { limit } })
+};
+
 export default api;
