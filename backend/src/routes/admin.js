@@ -10,7 +10,12 @@ router.get('/users', adminController.getAllUsers);
 router.put('/users/:id', adminController.updateUser);
 router.get('/contents', adminController.getAllContents);
 router.get('/purchases', adminController.getPurchases);
+router.get('/categories', adminController.getAllCategories);
 router.post('/categories', adminController.createCategory);
+router.put('/categories/:id', adminController.updateCategory);
 router.delete('/categories/:id', adminController.deleteCategory);
+router.get('/testimonials', adminController.getTestimonials);
+router.put('/testimonials/:id/approve', adminController.approveTestimonial);
+router.delete('/testimonials/:id', adminController.deleteTestimonial);
 
 module.exports = router;

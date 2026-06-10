@@ -1,4 +1,4 @@
-# SiteVideo - Plateforme de Gestion Multimédia
+# SavoirBox - Plateforme de Gestion Multimédia
 
 Application full-stack de gestion de vidéos YouTube, documents PDF, et fichiers audio avec système de monétisation gratuit/payant.
 
@@ -16,7 +16,7 @@ Application full-stack de gestion de vidéos YouTube, documents PDF, et fichiers
 ## Structure du Projet
 
 ```
-SiteVideo/
+SavoirBox/
 ├── backend/             # API Express
 │   ├── src/
 │   │   ├── config/      # Connexion DB
@@ -75,7 +75,7 @@ npm run dev           # Lance sur http://localhost:5173
 ```bash
 cd backend
 node scripts/seed.js
-# Email: admin@sitevideo.com
+# Email: admin@savoirbox.com
 # Mot de passe: Admin123!
 ```
 

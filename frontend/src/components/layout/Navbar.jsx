@@ -98,7 +98,7 @@ export default function Navbar() {
                 <FiMonitor size={18} />
               </div>
               <span className="font-bold text-xl hidden sm:block">
-                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SV</span>
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SavoirBox</span>
               </span>
             </Link>
           </div>
@@ -258,7 +258,7 @@ export default function Navbar() {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow-md">
                 <FiMonitor size={18} />
               </div>
-              <span className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SiteVideo</span>
+              <span className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SavoirBox</span>
             </Link>
             <button onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-base-200 transition-colors">
               <FiX size={20} />

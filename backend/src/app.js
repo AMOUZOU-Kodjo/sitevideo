@@ -11,6 +11,7 @@ const adminRoutes = require('./routes/admin');
 const youtubeRoutes = require('./routes/youtube');
 const testimonialRoutes = require('./routes/testimonials');
 const contactRoutes = require('./routes/contact');
+const settingsRoutes = require('./routes/settings');
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/youtube', youtubeRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

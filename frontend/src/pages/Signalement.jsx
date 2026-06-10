@@ -112,7 +112,7 @@ export default function Signalement() {
                     <input
                       type="url"
                       name="url"
-                      placeholder="https://sitevideo.com/content/..."
+                      placeholder="https://savoirbox.com/content/..."
                       className="input input-bordered w-full"
                       value={form.url}
                       onChange={handleChange}

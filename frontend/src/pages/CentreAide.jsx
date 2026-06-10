@@ -29,7 +29,7 @@ export default function CentreAide() {
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Comment pouvons-nous vous aider ?</h1>
           <p className="text-base-content/60 max-w-xl mx-auto mb-8">
-            Trouvez des réponses à vos questions et profitez pleinement de SiteVideo.
+            Trouvez des réponses à vos questions et profitez pleinement de SavoirBox.
           </p>
           <div className="max-w-lg mx-auto relative">
             <FiSearch size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" />

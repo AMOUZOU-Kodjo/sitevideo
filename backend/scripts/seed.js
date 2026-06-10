@@ -9,7 +9,7 @@ async function seed() {
   });
 
   try {
-    const email = 'admin@sitevideo.com';
+    const email = 'admin@savoirbox.com';
     const password = 'Admin123!';
     const hashed = await bcrypt.hash(password, 12);
 

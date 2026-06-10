@@ -20,6 +20,9 @@ import AdminUsers from './pages/admin/Users';
 import AdminContents from './pages/admin/Contents';
 import AddContent from './pages/admin/AddContent';
 import AdminPurchases from './pages/admin/Purchases';
+import AdminCategories from './pages/admin/Categories';
+import AdminTestimonials from './pages/admin/Testimonials';
+import AdminSettings from './pages/admin/Settings';
 
 function App() {
   const { loading } = useAuth();
@@ -43,6 +46,9 @@ function App() {
           <Route path="contents/add" element={<ProtectedRoute adminOnly><AddContent /></ProtectedRoute>} />
           <Route path="contents/edit/:id" element={<ProtectedRoute adminOnly><AddContent /></ProtectedRoute>} />
           <Route path="purchases" element={<ProtectedRoute adminOnly><AdminPurchases /></ProtectedRoute>} />
+          <Route path="categories" element={<ProtectedRoute adminOnly><AdminCategories /></ProtectedRoute>} />
+          <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
+          <Route path="settings" element={<ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>} />
         </Route>
 
         <Route path="/" element={<><Navbar /><main className="flex-1"><Home /></main><Footer /></>} />

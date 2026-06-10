@@ -1,6 +1,17 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FiBarChart2, FiUsers, FiFilm, FiPlus, FiLogOut, FiHome, FiShoppingCart } from 'react-icons/fi';
+import { FiBarChart2, FiUsers, FiFilm, FiPlus, FiLogOut, FiHome, FiShoppingCart, FiChevronRight, FiSettings, FiBox, FiFolder, FiMessageSquare, FiSliders } from 'react-icons/fi';
+
+const links = [
+  { to: '/admin/dashboard', icon: FiBarChart2, label: 'Tableau de bord' },
+  { to: '/admin/contents', icon: FiFilm, label: 'Tous les contenus' },
+  { to: '/admin/contents/add', icon: FiPlus, label: 'Ajouter un contenu' },
+  { to: '/admin/categories', icon: FiFolder, label: 'Catégories' },
+  { to: '/admin/testimonials', icon: FiMessageSquare, label: 'Témoignages' },
+  { to: '/admin/users', icon: FiUsers, label: 'Utilisateurs' },
+  { to: '/admin/purchases', icon: FiShoppingCart, label: 'Ventes' },
+  { to: '/admin/settings', icon: FiSliders, label: 'Paramètres' }
+];
 
 export default function AdminLayout() {
   const { user, logout, isAdmin } = useAuth();
@@ -12,64 +23,115 @@ export default function AdminLayout() {
     return null;
   }
 
-  const links = [
-    { to: '/admin/dashboard', icon: FiBarChart2, label: 'Tableau de bord' },
-    { to: '/admin/contents', icon: FiFilm, label: 'Contenus' },
-    { to: '/admin/contents/add', icon: FiPlus, label: 'Ajouter' },
-    { to: '/admin/users', icon: FiUsers, label: 'Utilisateurs' },
-    { to: '/admin/purchases', icon: FiShoppingCart, label: 'Ventes' }
-  ];
+  const currentLink = links.find(l => {
+    if (l.to === '/admin/dashboard') return location.pathname === '/admin/dashboard';
+    return location.pathname.startsWith(l.to);
+  });
 
   return (
-    <div className="drawer lg:drawer-open min-h-screen">
+    <div className="drawer lg:drawer-open min-h-screen bg-base-200/30">
       <input id="admin-drawer" type="checkbox" className="drawer-toggle" />
+
+      {/* Main content */}
       <div className="drawer-content flex flex-col">
-        <div className="navbar bg-base-100 shadow-sm lg:hidden">
+        {/* Top navbar (mobile) */}
+        <div className="navbar bg-base-100 border-b border-base-200 lg:hidden sticky top-0 z-30">
           <label htmlFor="admin-drawer" className="btn btn-square btn-ghost">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
           </label>
-          <span className="font-bold">Admin</span>
+          <div className="flex-1 flex items-center gap-2">
+            <span className="font-bold text-sm">Administration</span>
+            {currentLink && (
+              <>
+                <FiChevronRight size={14} className="text-base-content/30" />
+                <span className="text-sm text-base-content/60">{currentLink.label}</span>
+              </>
+            )}
+          </div>
+          <div className="avatar placeholder">
+            <div className="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-xs">
+              {user.name?.charAt(0).toUpperCase()}
+            </div>
+          </div>
         </div>
+
+        {/* Page content */}
         <div className="p-4 md:p-8">
           <Outlet />
         </div>
+
+        {/* Footer */}
+        <footer className="mt-auto px-8 py-4 border-t border-base-200 text-xs text-base-content/30 flex justify-between">
+          <span>© {new Date().getFullYear()} SavoirBox — Administration</span>
+          <span>v1.0.0</span>
+        </footer>
       </div>
 
+      {/* Sidebar */}
       <div className="drawer-side">
         <label htmlFor="admin-drawer" className="drawer-overlay"></label>
-        <aside className="bg-base-200 min-h-full w-72 p-4 flex flex-col">
-          <div className="mb-8">
-            <Link to="/" className="text-xl font-bold text-primary">SiteVideo</Link>
-            <p className="text-sm opacity-60 mt-1">Espace Administration</p>
-          </div>
-
-          <div className="flex items-center gap-3 mb-6 p-3 bg-base-300 rounded-lg">
-            <div className="avatar placeholder">
-              <div className="bg-primary text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">
-                {user.name?.charAt(0).toUpperCase()}
+        <aside className="bg-base-100 min-h-full w-72 flex flex-col border-r border-base-200">
+          {/* Logo area */}
+          <div className="p-5 border-b border-base-200">
+            <Link to="/admin/dashboard" className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-md">
+                <FiBox size={18} className="text-white" />
               </div>
-            </div>
-            <div>
-              <p className="font-semibold text-sm">{user.name}</p>
-              <p className="text-xs opacity-60">{user.email}</p>
-              <span className="badge badge-warning badge-xs mt-1">Admin</span>
+              <div>
+                <p className="font-bold text-base">SavoirBox</p>
+                <p className="text-[10px] text-base-content/40 uppercase tracking-wider">Administration</p>
+              </div>
+            </Link>
+          </div>
+
+          {/* User card */}
+          <div className="mx-4 mt-4 p-3 bg-base-200/50 rounded-xl border border-base-200">
+            <div className="flex items-center gap-3">
+              <div className="avatar placeholder">
+                <div className="bg-gradient-to-br from-primary to-secondary text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-sm shadow-sm">
+                  {user.name?.charAt(0).toUpperCase()}
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm truncate">{user.name}</p>
+                <p className="text-xs text-base-content/40 truncate">{user.email}</p>
+              </div>
+              <span className="badge badge-warning badge-xs">Admin</span>
             </div>
           </div>
 
-          <ul className="menu p-0 flex-1">
-            {links.map((link) => (
-              <li key={link.to} className={location.pathname === link.to ? 'bordered' : ''}>
-                <Link to={link.to} className={location.pathname === link.to ? 'active' : ''}>
-                  <link.icon className="mr-2" /> {link.label}
-                </Link>
-              </li>
-            ))}
+          {/* Navigation */}
+          <ul className="menu p-2 flex-1 mt-2">
+            {links.map((link) => {
+              const isActive = link.to === '/admin/dashboard'
+                ? location.pathname === '/admin/dashboard'
+                : location.pathname.startsWith(link.to);
+              return (
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? 'bg-primary/10 text-primary shadow-sm'
+                        : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'
+                    }`}
+                  >
+                    <link.icon size={18} />
+                    {link.label}
+                    {isActive && <FiChevronRight size={14} className="ml-auto text-primary/40" />}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
 
-          <div className="border-t border-base-300 pt-4 mt-4 space-y-2">
-            <Link to="/" className="btn btn-ghost btn-sm w-full justify-start"><FiHome className="mr-2" /> Retour au site</Link>
-            <button onClick={() => { logout(); navigate('/'); }} className="btn btn-ghost btn-sm w-full justify-start text-error">
-              <FiLogOut className="mr-2" /> Déconnexion
+          {/* Bottom links */}
+          <div className="border-t border-base-200 p-4 space-y-1.5">
+            <Link to="/" className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-base-content/50 hover:bg-base-200 hover:text-base-content transition-all">
+              <FiHome size={16} /> Retour au site
+            </Link>
+            <button onClick={() => { logout(); navigate('/'); }} className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-error/70 hover:bg-error/5 hover:text-error transition-all w-full">
+              <FiLogOut size={16} /> Déconnexion
             </button>
           </div>
         </aside>

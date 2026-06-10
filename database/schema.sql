@@ -76,3 +76,20 @@ CREATE TABLE IF NOT EXISTS testimonials (
   is_approved BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+CREATE TABLE IF NOT EXISTS site_settings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  key VARCHAR(255) UNIQUE NOT NULL,
+  value JSONB NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+INSERT INTO site_settings (key, value) VALUES
+('site_name', '"SavoirBox"'),
+('site_description', '"Plateforme de vidéos, documents et contenus audio"'),
+('hero_title', '"Vidéos, Documents & Audio."'),
+('hero_subtitle', '"La plateforme tout-en-un pour découvrir, apprendre et partager. Contenu gratuit ou premium, streaming intégré, sans publicité."'),
+('cta_text', '"Rejoignez notre communauté et accédez à des centaines de contenus gratuitement."'),
+('features', '[{"icon":"play-circle","title":"Vidéos YouTube","desc":"Streaming HD intégré sans quitter la plateforme."},{"icon":"file-text","title":"Documents PDF","desc":"Lecteur intégré avec aperçu. Téléchargement direct."},{"icon":"music","title":"Contenu Audio","desc":"Lecteur audio intégré. Streaming MP3, WAV, OGG."},{"icon":"award","title":"Contenu Premium","desc":"Monétisez vos créations. Accès sécurisé par paiement."}]'),
+('stats', '[{"icon":"book-open","value":528,"suffix":"+","label":"Contenus disponibles"},{"icon":"users","value":12400,"suffix":"+","label":"Utilisateurs actifs"},{"icon":"star","value":48,"suffix":"/5","label":"Note moyenne"},{"icon":"zap","value":999,"suffix":"%","label":"Temps de disponibilité"}]')
+ON CONFLICT (key) DO NOTHING;

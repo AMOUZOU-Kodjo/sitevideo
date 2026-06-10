@@ -40,8 +40,8 @@ export default function Footer() {
           {/* Brand — 3 cols */}
           <div className="lg:col-span-3">
             <Link to="/" className="inline-flex items-center gap-2 text-2xl font-extrabold">
-              <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm shadow-lg">SV</span>
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SV</span>
+              <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm shadow-lg">SB</span>
+              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SavoirBox</span>
             </Link>
             <p className="text-sm text-base-content/60 mt-4 leading-relaxed max-w-xs">
               Plateforme multimédia nouvelle génération. Vidéos, documents PDF et contenus audio en streaming ou téléchargement.
@@ -165,7 +165,7 @@ export default function Footer() {
             <span className="hover:text-base-content/70 transition-colors cursor-default">Confidentialité</span>
             <span className="hover:text-base-content/70 transition-colors cursor-default">Cookies</span>
             <span className="flex items-center gap-1 ml-2">
-              Fait avec <FiHeart size={11} className="text-red-500" /> par SV
+              Fait avec <FiHeart size={11} className="text-red-500" /> par SavoirBox
             </span>
           </div>
         </div>

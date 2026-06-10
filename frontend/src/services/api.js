@@ -55,8 +55,19 @@ export const adminAPI = {
   updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
   getContents: (params) => api.get('/admin/contents', { params }),
   getPurchases: (params) => api.get('/admin/purchases', { params }),
+  getCategories: () => api.get('/admin/categories'),
   createCategory: (data) => api.post('/admin/categories', data),
-  deleteCategory: (id) => api.delete(`/admin/categories/${id}`)
+  updateCategory: (id, data) => api.put(`/admin/categories/${id}`, data),
+  deleteCategory: (id) => api.delete(`/admin/categories/${id}`),
+  getTestimonials: (params) => api.get('/admin/testimonials', { params }),
+  approveTestimonial: (id) => api.put(`/admin/testimonials/${id}/approve`),
+  deleteTestimonial: (id) => api.delete(`/admin/testimonials/${id}`)
+};
+
+export const settingsAPI = {
+  getAll: () => api.get('/settings'),
+  update: (key, value) => api.put('/settings', { key, value }),
+  updateBulk: (data) => api.put('/settings/bulk', data)
 };
 
 export const youtubeAPI = {

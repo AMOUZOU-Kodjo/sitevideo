@@ -2,7 +2,17 @@ const db = require('../config/database');
 
 exports.getStats = async (req, res, next) => {
   try {
-    const [userCount, contentCount, purchaseCount, revenue, recentUsers] = await Promise.all([
+    const [
+      userCount,
+      contentCount,
+      purchaseCount,
+      revenue,
+      recentUsers,
+      monthlyUsers,
+      monthlyContents,
+      monthlyRevenue,
+      topContents
+    ] = await Promise.all([
       db.query('SELECT COUNT(*) FROM users WHERE role = $1', ['user']),
       db.query(`SELECT
         COUNT(*) as total,
@@ -13,16 +23,65 @@ exports.getStats = async (req, res, next) => {
         COUNT(CASE WHEN status = 'paid' THEN 1 END) as paid
         FROM contents`),
       db.query('SELECT COUNT(*) FROM purchases WHERE status = $1', ['completed']),
-      db.query('SELECT COALESCE(SUM(amount), 0) as total FROM purchases WHERE status = $1', ['completed']),
-      db.query('SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 10')
+      db.query("SELECT COALESCE(SUM(amount), 0) as total FROM purchases WHERE status = $1", ['completed']),
+      db.query('SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 10'),
+      db.query(`
+        SELECT
+          to_char(date_trunc('month', created_at), 'YYYY-MM') as month,
+          COUNT(*) as count
+        FROM users
+        WHERE created_at >= NOW() - INTERVAL '12 months'
+        GROUP BY date_trunc('month', created_at)
+        ORDER BY month ASC
+      `),
+      db.query(`
+        SELECT
+          to_char(date_trunc('month', created_at), 'YYYY-MM') as month,
+          COUNT(CASE WHEN type = 'video' THEN 1 END) as videos,
+          COUNT(CASE WHEN type = 'document' THEN 1 END) as documents,
+          COUNT(CASE WHEN type = 'audio' THEN 1 END) as audios,
+          COUNT(*) as total
+        FROM contents
+        WHERE created_at >= NOW() - INTERVAL '12 months'
+        GROUP BY date_trunc('month', created_at)
+        ORDER BY month ASC
+      `),
+      db.query(`
+        SELECT
+          to_char(date_trunc('month', created_at), 'YYYY-MM') as month,
+          COUNT(*) as purchases,
+          COALESCE(SUM(amount), 0) as revenue
+        FROM purchases
+        WHERE status = 'completed' AND created_at >= NOW() - INTERVAL '12 months'
+        GROUP BY date_trunc('month', created_at)
+        ORDER BY month ASC
+      `),
+      db.query(`
+        SELECT id, title, type, status, views_count, downloads_count
+        FROM contents
+        ORDER BY views_count DESC
+        LIMIT 5
+      `)
     ]);
 
     res.json({
       totalUsers: parseInt(userCount.rows[0].count),
-      contents: contentCount.rows[0],
+      contents: {
+        ...contentCount.rows[0],
+        total: parseInt(contentCount.rows[0].total),
+        videos: parseInt(contentCount.rows[0].videos),
+        documents: parseInt(contentCount.rows[0].documents),
+        audios: parseInt(contentCount.rows[0].audios),
+        free: parseInt(contentCount.rows[0].free),
+        paid: parseInt(contentCount.rows[0].paid)
+      },
       totalPurchases: parseInt(purchaseCount.rows[0].count),
       totalRevenue: parseFloat(revenue.rows[0].total),
-      recentUsers: recentUsers.rows
+      recentUsers: recentUsers.rows,
+      monthlyUsers: monthlyUsers.rows,
+      monthlyContents: monthlyContents.rows,
+      monthlyRevenue: monthlyRevenue.rows,
+      topContents: topContents.rows
     });
   } catch (error) {
     next(error);
@@ -140,6 +199,38 @@ exports.getAllContents = async (req, res, next) => {
   }
 };
 
+exports.updateCategory = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: 'Category name is required.' });
+
+    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const result = await db.query(
+      'UPDATE categories SET name = $1, slug = $2 WHERE id = $3 RETURNING *',
+      [name, slug, req.params.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Category not found.' });
+    res.json(result.rows[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getAllCategories = async (req, res, next) => {
+  try {
+    const result = await db.query(`
+      SELECT c.*, COUNT(con.id) as content_count
+      FROM categories c
+      LEFT JOIN contents con ON c.id = con.category_id
+      GROUP BY c.id
+      ORDER BY c.name ASC
+    `);
+    res.json(result.rows);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createCategory = async (req, res, next) => {
   try {
     const { name } = req.body;
@@ -157,6 +248,65 @@ exports.deleteCategory = async (req, res, next) => {
   try {
     await db.query('DELETE FROM categories WHERE id = $1', [req.params.id]);
     res.json({ message: 'Category deleted.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getTestimonials = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 20, approved } = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+
+    let query = 'SELECT * FROM testimonials';
+    const values = [];
+    let paramIndex = 1;
+
+    if (approved === 'true') {
+      query += ` WHERE is_approved = true`;
+    } else if (approved === 'false') {
+      query += ` WHERE is_approved = false`;
+    }
+
+    const countQuery = query.replace(/SELECT \*/, 'SELECT COUNT(*)');
+    query += ' ORDER BY created_at DESC';
+    query += ` LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
+    values.push(parseInt(limit), offset);
+
+    const [dataResult, countResult] = await Promise.all([
+      db.query(query, values),
+      db.query(countQuery, values.slice(0, -2))
+    ]);
+
+    res.json({
+      testimonials: dataResult.rows,
+      total: parseInt(countResult.rows[0].count),
+      page: parseInt(page),
+      totalPages: Math.ceil(parseInt(countResult.rows[0].count) / parseInt(limit))
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.approveTestimonial = async (req, res, next) => {
+  try {
+    const result = await db.query(
+      'UPDATE testimonials SET is_approved = true WHERE id = $1 RETURNING *',
+      [req.params.id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Testimonial not found.' });
+    res.json(result.rows[0]);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteTestimonial = async (req, res, next) => {
+  try {
+    const result = await db.query('DELETE FROM testimonials WHERE id = $1 RETURNING id', [req.params.id]);
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Testimonial not found.' });
+    res.json({ message: 'Testimonial deleted.' });
   } catch (error) {
     next(error);
   }

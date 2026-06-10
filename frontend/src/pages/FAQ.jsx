@@ -32,7 +32,7 @@ const faqData = [
     items: [
       { q: 'La lecture vidéo ne fonctionne pas', r: 'Essayez de rafraîchir la page, de vider le cache de votre navigateur ou de désactiver vos extensions. Si le problème persiste, contactez notre support.' },
       { q: 'L\'application est lente', r: 'Vérifiez votre connexion internet et essayez de réduire la qualité vidéo dans les paramètres de lecture. Fermez les autres applications gourmandes en bande passante.' },
-      { q: 'Je ne reçois pas les emails', r: 'Vérifiez vos spams et assurez-vous que votre adresse email est correcte. Ajoutez contact@sitevideo.com à vos contacts.' }
+      { q: 'Je ne reçois pas les emails', r: 'Vérifiez vos spams et assurez-vous que votre adresse email est correcte. Ajoutez contact@savoirbox.com à vos contacts.' }
     ]
   }
 ]
@@ -61,7 +61,7 @@ export default function FAQ() {
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Foire aux questions</h1>
           <p className="text-base-content/60 max-w-xl mx-auto mb-8">
-            Retrouvez les réponses aux questions les plus fréquentes sur SiteVideo.
+            Retrouvez les réponses aux questions les plus fréquentes sur SavoirBox.
           </p>
           <div className="max-w-lg mx-auto relative">
             <FiSearch size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40" />

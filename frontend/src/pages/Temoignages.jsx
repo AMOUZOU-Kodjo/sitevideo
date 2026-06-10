@@ -120,7 +120,7 @@ export default function Temoignages() {
                 </div>
                 <div className="form-control">
                   <label className="label"><span className="label-text font-medium">Votre témoignage *</span></label>
-                  <textarea name="content" rows={4} placeholder="Dites-nous ce que vous pensez de SiteVideo..." className="textarea textarea-bordered resize-none" value={form.content} onChange={handleChange} />
+                  <textarea name="content" rows={4} placeholder="Dites-nous ce que vous pensez de SavoirBox..." className="textarea textarea-bordered resize-none" value={form.content} onChange={handleChange} />
                 </div>
                 <button type="submit" className="btn btn-primary gap-2" disabled={sending}>
                   {sending ? <span className="loading loading-spinner loading-sm"></span> : <FiSend size={16} />}
@@ -207,7 +207,7 @@ export default function Temoignages() {
             <FiHeart size={36} className="mx-auto mb-4" />
             <h2 className="text-2xl md:text-3xl font-bold mb-3">Rejoignez notre communauté</h2>
             <p className="opacity-80 max-w-md mx-auto mb-6">
-              Des milliers d'utilisateurs nous font confiance. Créez votre compte gratuitement et découvrez SiteVideo.
+              Des milliers d'utilisateurs nous font confiance. Créez votre compte gratuitement et découvrez SavoirBox.
             </p>
             <a href="/register" className="btn btn-accent gap-2">Créer un compte gratuit</a>
           </div>

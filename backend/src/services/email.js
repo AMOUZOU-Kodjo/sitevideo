@@ -14,7 +14,7 @@ function getResend() {
 }
 
 const FROM_EMAIL = process.env.EMAIL_FROM || 'onboarding@resend.dev';
-const TO_EMAIL = process.env.EMAIL_TO || 'contact@sitevideo.com';
+const TO_EMAIL = process.env.EMAIL_TO || 'contact@savoirbox.com';
 
 function layout(content) {
   return `
@@ -23,7 +23,7 @@ function layout(content) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SiteVideo</title>
+  <title>SavoirBox</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;padding:32px 16px">
@@ -36,7 +36,7 @@ function layout(content) {
                 <tr>
                   <td align="center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;padding:8px 20px">
                     <span style="color:#fff;font-size:20px;font-weight:800">SV</span>
-                    <span style="color:#fff;font-size:20px;font-weight:300;margin-left:4px">SiteVideo</span>
+                    <span style="color:#fff;font-size:20px;font-weight:300;margin-left:4px">SavoirBox</span>
                   </td>
                 </tr>
               </table>
@@ -49,9 +49,9 @@ function layout(content) {
           </tr>
           <tr>
             <td align="center" style="padding-top:24px;color:#9ca3af;font-size:12px;line-height:1.6">
-              <p style="margin:0">SiteVideo — Plateforme multimédia nouvelle génération</p>
+              <p style="margin:0">SavoirBox — Plateforme multimédia nouvelle génération</p>
               <p style="margin:4px 0 0">Cet email a été envoyé automatiquement depuis notre plateforme.</p>
-              <p style="margin:4px 0 0">&copy; ${new Date().getFullYear()} SiteVideo. Tous droits réservés.</p>
+              <p style="margin:4px 0 0">&copy; ${new Date().getFullYear()} SavoirBox. Tous droits réservés.</p>
             </td>
           </tr>
         </table>
@@ -81,7 +81,7 @@ async function sendEmail({ subject, html, to }) {
   if (!client) return null;
   try {
     const { data, error } = await client.emails.send({
-      from: `SiteVideo <${FROM_EMAIL}>`,
+      from: `SavoirBox <${FROM_EMAIL}>`,
       to: to || TO_EMAIL,
       subject,
       html
@@ -173,7 +173,7 @@ function testimonialEmail({ name, role, content, rating }) {
         <tr>
           <td style="padding-bottom:24px">
             <h1 style="margin:0;font-size:22px;color:#111827;font-weight:700">Nouveau t&eacute;moignage publi&eacute;</h1>
-            <p style="margin:8px 0 0;font-size:14px;color:#6b7280">Un utilisateur a partag&eacute; son exp&eacute;rience sur SiteVideo.</p>
+            <p style="margin:8px 0 0;font-size:14px;color:#6b7280">Un utilisateur a partag&eacute; son exp&eacute;rience sur SavoirBox.</p>
           </td>
         </tr>
         <tr>
