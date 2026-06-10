@@ -63,4 +63,13 @@ export const youtubeAPI = {
   getLatest: (limit) => api.get('/youtube/latest', { params: { limit } })
 };
 
+export const testimonialAPI = {
+  getAll: () => api.get('/testimonials'),
+  create: (data) => api.post('/testimonials', data)
+};
+
+export const contactAPI = {
+  send: (data) => api.post('/contact', data)
+};
+
 export default api;

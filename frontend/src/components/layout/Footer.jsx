@@ -41,7 +41,7 @@ export default function Footer() {
           <div className="lg:col-span-3">
             <Link to="/" className="inline-flex items-center gap-2 text-2xl font-extrabold">
               <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm shadow-lg">SV</span>
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SiteVideo</span>
+              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SV</span>
             </Link>
             <p className="text-sm text-base-content/60 mt-4 leading-relaxed max-w-xs">
               Plateforme multimédia nouvelle génération. Vidéos, documents PDF et contenus audio en streaming ou téléchargement.
@@ -116,9 +116,15 @@ export default function Footer() {
           <div className="lg:col-span-3">
             <h4 className="font-semibold text-xs uppercase tracking-[0.15em] text-base-content/50 mb-5">Support</h4>
             <ul className="space-y-3.5 mb-6">
-              {['Centre d\'aide', 'Nous contacter', 'FAQ', 'Signalement'].map((l, i) => (
+              {[
+                { to: '/aide', label: 'Centre d\'aide' },
+                { to: '/contact', label: 'Nous contacter' },
+                { to: '/faq', label: 'FAQ' },
+                { to: '/signalement', label: 'Signalement' },
+                { to: '/temoignages', label: 'Témoignages' }
+              ].map((l, i) => (
                 <li key={i}>
-                  <span className="text-sm text-base-content/50 cursor-default hover:text-base-content/70 transition-colors">{l}</span>
+                  <Link to={l.to} className="text-sm text-base-content/50 hover:text-primary transition-colors">{l.label}</Link>
                 </li>
               ))}
             </ul>
@@ -153,13 +159,13 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="py-6 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-base-content/40">
-          <p>&copy; {currentYear} SiteVideo. Tous droits réservés.</p>
+          <p>&copy; {currentYear} SV. Tous droits réservés.</p>
           <div className="flex items-center gap-4">
             <span className="hover:text-base-content/70 transition-colors cursor-default">CGU</span>
             <span className="hover:text-base-content/70 transition-colors cursor-default">Confidentialité</span>
             <span className="hover:text-base-content/70 transition-colors cursor-default">Cookies</span>
             <span className="flex items-center gap-1 ml-2">
-              Fait avec <FiHeart size={11} className="text-red-500" /> par SiteVideo
+              Fait avec <FiHeart size={11} className="text-red-500" /> par SV
             </span>
           </div>
         </div>

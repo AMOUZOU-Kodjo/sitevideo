@@ -10,6 +10,11 @@ import Register from './pages/Register';
 import Catalog from './pages/Catalog';
 import ContentDetail from './pages/ContentDetail';
 import MyLibrary from './pages/MyLibrary';
+import CentreAide from './pages/CentreAide';
+import NousContacter from './pages/NousContacter';
+import FAQ from './pages/FAQ';
+import Signalement from './pages/Signalement';
+import Temoignages from './pages/Temoignages';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminUsers from './pages/admin/Users';
 import AdminContents from './pages/admin/Contents';
@@ -46,6 +51,11 @@ function App() {
         <Route path="/login" element={<><Navbar /><main className="flex-1"><Login /></main><Footer /></>} />
         <Route path="/register" element={<><Navbar /><main className="flex-1"><Register /></main><Footer /></>} />
         <Route path="/library" element={<><Navbar /><main className="flex-1"><ProtectedRoute><MyLibrary /></ProtectedRoute></main><Footer /></>} />
+        <Route path="/aide" element={<><Navbar /><main className="flex-1"><CentreAide /></main><Footer /></>} />
+        <Route path="/contact" element={<><Navbar /><main className="flex-1"><NousContacter /></main><Footer /></>} />
+        <Route path="/faq" element={<><Navbar /><main className="flex-1"><FAQ /></main><Footer /></>} />
+        <Route path="/signalement" element={<><Navbar /><main className="flex-1"><Signalement /></main><Footer /></>} />
+        <Route path="/temoignages" element={<><Navbar /><main className="flex-1"><Temoignages /></main><Footer /></>} />
       </Routes>
     </div>
   );

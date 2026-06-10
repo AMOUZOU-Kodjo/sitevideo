@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { contentAPI } from '../services/api'
+import { contentAPI, testimonialAPI } from '../services/api'
 import {
   FiPlay, FiFileText, FiMusic, FiArrowRight, FiStar, FiUsers, FiBookOpen,
   FiShield, FiZap, FiTrendingUp, FiChevronRight, FiBox, FiPlayCircle,
@@ -92,10 +92,10 @@ const steps = [
   { num: '03', title: 'Profitez', desc: 'Streaming intégré, lecteur PDF, téléchargement — tout est conçu pour une expérience fluide.', icon: FiPlay }
 ]
 
-const testimonials = [
-  { name: 'Sophie Martin', role: 'Enseignante', avatar: 'SM', text: 'Plateforme formidable pour partager mes cours avec mes élèves. L\'aperçu PDF est très pratique.', rating: 5 },
-  { name: 'Thomas Dubois', role: 'Créateur de contenu', avatar: 'TD', text: 'La monétisation intégrée m\'a permis de vendre mes formations vidéo facilement.', rating: 5 },
-  { name: 'Marie Leroy', role: 'Étudiante', avatar: 'ML', text: 'Je trouve toujours ce qu\'il me faut. L\'interface est claire et les téléchargements rapides.', rating: 5 }
+const fallbackTestimonials = [
+  { name: 'Sophie Martin', role: 'Enseignante', avatar: 'SM', content: 'Plateforme formidable pour partager mes cours avec mes élèves. L\'aperçu PDF est très pratique.', rating: 5 },
+  { name: 'Thomas Dubois', role: 'Créateur de contenu', avatar: 'TD', content: 'La monétisation intégrée m\'a permis de vendre mes formations vidéo facilement.', rating: 5 },
+  { name: 'Marie Leroy', role: 'Étudiante', avatar: 'ML', content: 'Je trouve toujours ce qu\'il me faut. L\'interface est claire et les téléchargements rapides.', rating: 5 }
 ]
 
 const statItems = [
@@ -108,6 +108,7 @@ const statItems = [
 export default function Home() {
   const [contents, setContents] = useState([])
   const [featured, setFeatured] = useState([])
+  const [testimonials, setTestimonials] = useState(fallbackTestimonials)
   const [currentSlide, setCurrentSlide] = useState(0)
 
   useEffect(() => {
@@ -115,13 +116,16 @@ export default function Home() {
       setContents(res.data.contents)
       setFeatured(res.data.contents.filter(c => c.status === 'paid' || c.views_count > 10).slice(0, 3))
     }).catch(() => {})
+    testimonialAPI.getAll().then((res) => {
+      if (res.data.length > 0) setTestimonials(res.data)
+    }).catch(() => {})
   }, [])
 
   useEffect(() => {
     if (testimonials.length === 0) return
     const timer = setInterval(() => setCurrentSlide((prev) => (prev + 1) % testimonials.length), 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [testimonials.length])
 
   const renderStars = (n) => Array.from({ length: n }, (_, i) => (
     <FiStar key={i} size={18} className="fill-amber-400 text-amber-400" />
@@ -289,6 +293,40 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══════════════ CATEGORIES ═══════════════ */}
+      <section className="py-28 px-4 md:px-8 max-w-7xl mx-auto">
+        <Reveal>
+          <div className="text-center mb-16">
+            <span className="badge badge-primary badge-outline mb-4 px-4 py-2">Catégories</span>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Explorez par type de contenu</h2>
+            <p className="text-base-content/60 max-w-2xl mx-auto text-lg">
+              Vidéos, documents et audio — tout est centralisé sur une seule plateforme.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { icon: FiPlay, label: 'Vidéos', desc: 'Tutoriels, cours enregistrés, conférences et plus en streaming HD.', color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/30', hover: 'group-hover:border-blue-500/30 group-hover:shadow-blue-500/10', iconBg: 'bg-blue-100 dark:bg-blue-900/50', iconColor: 'text-blue-600 dark:text-blue-400', link: '/catalog?type=video' },
+            { icon: FiFileText, label: 'Documents', desc: 'PDF, cours, exercices, livres blancs à télécharger ou consulter en ligne.', color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/30', hover: 'group-hover:border-emerald-500/30 group-hover:shadow-emerald-500/10', iconBg: 'bg-emerald-100 dark:bg-emerald-900/50', iconColor: 'text-emerald-600 dark:text-emerald-400', link: '/catalog?type=document' },
+            { icon: FiMusic, label: 'Audio', desc: 'Podcasts, livres audio, musiques et enregistrements en streaming direct.', color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/30', hover: 'group-hover:border-purple-500/30 group-hover:shadow-purple-500/10', iconBg: 'bg-purple-100 dark:bg-purple-900/50', iconColor: 'text-purple-600 dark:text-purple-400', link: '/catalog?type=audio' }
+          ].map((cat, i) => (
+            <Reveal key={i} delay={i * 100}>
+              <Link to={cat.link} className={`${cat.bg} rounded-2xl p-8 border border-base-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group block ${cat.hover}`}>
+                <div className={`${cat.iconBg} ${cat.iconColor} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg`}>
+                  <cat.icon size={28} />
+                </div>
+                <h3 className="text-2xl font-bold mb-3 group-hover:translate-x-1 transition-transform">{cat.label}</h3>
+                <p className="text-base-content/70 leading-relaxed mb-6">{cat.desc}</p>
+                <span className={`inline-flex items-center gap-2 text-sm font-semibold ${cat.color} group-hover:gap-3 transition-all`}>
+                  Parcourir <FiArrowRight size={14} />
+                </span>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
       {/* ═══════════════ LATEST ═══════════════ */}
       <section className="py-20 px-4 md:px-8 bg-base-200/40">
         <div className="max-w-7xl mx-auto">
@@ -421,10 +459,10 @@ export default function Home() {
                   </div>
                   <div className="relative">
                     <span className="absolute -top-6 -left-2 text-6xl text-primary/10 font-serif leading-none">"</span>
-                    <p className="text-xl md:text-2xl leading-relaxed italic text-base-content/80 mb-8 px-4">"{t.text}"</p>
+                    <p className="text-xl md:text-2xl leading-relaxed italic text-base-content/80 mb-8 px-4">"{t.content}"</p>
                   </div>
                   <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary text-white font-bold flex items-center justify-center mx-auto mb-3 text-sm shadow-lg ring-4 ring-base-100">
-                    {t.avatar}
+                    {t.name?.split(' ').map(s => s[0]).join('').toUpperCase().slice(0, 2) || '??'}
                   </div>
                   <p className="font-bold text-lg">{t.name}</p>
                   <p className="text-sm text-base-content/50">{t.role}</p>

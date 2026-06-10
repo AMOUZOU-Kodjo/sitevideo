@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import {
   FiHome, FiGrid, FiBook, FiShield, FiSun, FiMoon, FiUser, FiLogOut,
   FiMenu, FiX, FiChevronDown, FiChevronRight, FiPlay, FiFileText,
-  FiMusic, FiStar, FiArrowRight, FiMonitor
+  FiMusic, FiStar, FiArrowRight, FiMonitor, FiMail, FiMessageSquare
 } from 'react-icons/fi'
 
 const contentTypes = [
@@ -98,7 +98,7 @@ export default function Navbar() {
                 <FiMonitor size={18} />
               </div>
               <span className="font-bold text-xl hidden sm:block">
-                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SiteVideo</span>
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SV</span>
               </span>
             </Link>
           </div>
@@ -151,6 +151,8 @@ export default function Navbar() {
             </div>
 
             {user && navLink('/library', 'Bibliothèque', <FiBook size={16} />)}
+            {navLink('/temoignages', 'Témoignages', <FiStar size={16} />)}
+            {navLink('/contact', 'Contact', <FiMail size={16} />)}
             {isAdmin && navLink('/admin/dashboard', 'Admin', <FiShield size={16} />, { startsWith: true, className: 'text-warning' })}
           </nav>
 
@@ -273,6 +275,8 @@ export default function Navbar() {
                 {[
                   { to: '/', label: 'Accueil', icon: FiHome },
                   { to: '/catalog', label: 'Catalogue', icon: FiGrid },
+                  { to: '/temoignages', label: 'Témoignages', icon: FiStar },
+                  { to: '/contact', label: 'Contact', icon: FiMail },
                 ].map(l => (
                   <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
