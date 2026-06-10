@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FiBarChart2, FiUsers, FiFilm, FiPlus, FiLogOut, FiHome, FiShoppingCart, FiChevronRight, FiSettings, FiBox, FiFolder, FiMessageSquare, FiSliders } from 'react-icons/fi';
+import { FiBarChart2, FiUsers, FiFilm, FiPlus, FiLogOut, FiHome, FiShoppingCart, FiChevronRight, FiChevronDown, FiSettings, FiBox, FiFolder, FiMessageSquare, FiSliders, FiCode, FiHelpCircle, FiAward } from 'react-icons/fi';
 
 const links = [
   { to: '/admin/dashboard', icon: FiBarChart2, label: 'Tableau de bord' },
@@ -13,6 +14,12 @@ const links = [
   { to: '/admin/settings', icon: FiSliders, label: 'Paramètres' }
 ];
 
+const courseLinks = [
+  { to: '/admin/courses', icon: FiCode, label: 'Cours' },
+  { to: '/admin/certificates', icon: FiAward, label: 'Certificats' },
+  { to: '/admin/forum', icon: FiHelpCircle, label: 'Forum' }
+];
+
 export default function AdminLayout() {
   const { user, logout, isAdmin } = useAuth();
   const location = useLocation();
@@ -23,7 +30,12 @@ export default function AdminLayout() {
     return null;
   }
 
-  const currentLink = links.find(l => {
+  const [courseOpen, setCourseOpen] = useState(() => {
+    const coursePaths = ['/admin/courses', '/admin/certificates', '/admin/forum'];
+    return coursePaths.some(p => location.pathname.startsWith(p));
+  });
+
+  const currentLink = [...links, ...courseLinks].find(l => {
     if (l.to === '/admin/dashboard') return location.pathname === '/admin/dashboard';
     return location.pathname.startsWith(l.to);
   });
@@ -123,6 +135,50 @@ export default function AdminLayout() {
                 </li>
               );
             })}
+
+            {/* Divider */}
+            <li className="menu-title text-[10px] uppercase tracking-wider text-base-content/30 px-3 pt-6 pb-2">Cours Python</li>
+
+            {/* Collapsible section */}
+            <li>
+              <button
+                onClick={() => setCourseOpen(!courseOpen)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  courseOpen
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-base-content/60 hover:bg-base-200 hover:text-base-content'
+                }`}
+              >
+                <FiCode size={18} />
+                Cours Python
+                {courseOpen ? <FiChevronDown size={14} className="ml-auto" /> : <FiChevronRight size={14} className="ml-auto" />}
+              </button>
+              {courseOpen && (
+                <ul className="ml-3 mt-1 space-y-0.5">
+                  {courseLinks.map((link) => {
+                    const isActive = link.to === '/admin/dashboard'
+                      ? location.pathname === '/admin/dashboard'
+                      : location.pathname.startsWith(link.to);
+                    return (
+                      <li key={link.to}>
+                        <Link
+                          to={link.to}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                            isActive
+                              ? 'bg-primary/10 text-primary shadow-sm'
+                              : 'text-base-content/50 hover:bg-base-200 hover:text-base-content'
+                          }`}
+                        >
+                          <link.icon size={16} />
+                          {link.label}
+                          {isActive && <FiChevronRight size={12} className="ml-auto text-primary/40" />}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </li>
           </ul>
 
           {/* Bottom links */}

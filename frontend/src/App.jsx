@@ -23,6 +23,15 @@ import AdminPurchases from './pages/admin/Purchases';
 import AdminCategories from './pages/admin/Categories';
 import AdminTestimonials from './pages/admin/Testimonials';
 import AdminSettings from './pages/admin/Settings';
+import CoursPython from './pages/CoursPython';
+import AdminCourses from './pages/admin/Courses';
+import AdminCourseForm from './pages/admin/CourseForm';
+import AdminLessons from './pages/admin/Lessons';
+import AdminForumManager from './pages/admin/ForumManager';
+import AdminEnrollments from './pages/admin/Enrollments';
+import AdminCertificates from './pages/admin/Certificates';
+import AdminQuizManager from './pages/admin/QuizManager';
+import AdminCourseQuizManager from './pages/admin/CourseQuizManager';
 
 function App() {
   const { loading } = useAuth();
@@ -49,6 +58,15 @@ function App() {
           <Route path="categories" element={<ProtectedRoute adminOnly><AdminCategories /></ProtectedRoute>} />
           <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
           <Route path="settings" element={<ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>} />
+          <Route path="courses" element={<ProtectedRoute adminOnly><AdminCourses /></ProtectedRoute>} />
+          <Route path="courses/add" element={<ProtectedRoute adminOnly><AdminCourseForm /></ProtectedRoute>} />
+          <Route path="courses/edit/:id" element={<ProtectedRoute adminOnly><AdminCourseForm /></ProtectedRoute>} />
+          <Route path="courses/:id/lessons" element={<ProtectedRoute adminOnly><AdminLessons /></ProtectedRoute>} />
+          <Route path="forum" element={<ProtectedRoute adminOnly><AdminForumManager /></ProtectedRoute>} />
+          <Route path="courses/:id/quizzes" element={<ProtectedRoute adminOnly><AdminCourseQuizManager /></ProtectedRoute>} />
+          <Route path="courses/:id/enrollments" element={<ProtectedRoute adminOnly><AdminEnrollments /></ProtectedRoute>} />
+          <Route path="lessons/:lessonId/quiz" element={<ProtectedRoute adminOnly><AdminQuizManager /></ProtectedRoute>} />
+          <Route path="certificates" element={<ProtectedRoute adminOnly><AdminCertificates /></ProtectedRoute>} />
         </Route>
 
         <Route path="/" element={<><Navbar /><main className="flex-1"><Home /></main><Footer /></>} />
@@ -62,6 +80,7 @@ function App() {
         <Route path="/faq" element={<><Navbar /><main className="flex-1"><FAQ /></main><Footer /></>} />
         <Route path="/signalement" element={<><Navbar /><main className="flex-1"><Signalement /></main><Footer /></>} />
         <Route path="/temoignages" element={<><Navbar /><main className="flex-1"><Temoignages /></main><Footer /></>} />
+        <Route path="/cours-python" element={<><Navbar /><main className="flex-1"><CoursPython /></main><Footer /></>} />
       </Routes>
     </div>
   );

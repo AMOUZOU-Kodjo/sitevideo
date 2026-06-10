@@ -1,5 +1,6 @@
 const db = require('../config/database');
 const cloudinary = require('../config/cloudinary');
+const path = require('path');
 
 exports.getAll = async (req, res, next) => {
   try {
@@ -83,13 +84,18 @@ exports.create = async (req, res, next) => {
     }
 
     let file_url = null;
+    let resourceType = null;
     if (req.files?.file) {
-      file_url = req.files.file[0].path;
+      file_url = req.files.file[0].cloudinaryUrl;
+      resourceType = req.files.file[0].resourceType;
     }
 
     let thumbUrl = null;
     if (req.files?.thumbnail) {
-      thumbUrl = req.files.thumbnail[0].path;
+      thumbUrl = req.files.thumbnail[0].cloudinaryUrl;
+    }
+    if (!thumbUrl && req.files?.file?.[0]?.thumbnailUrl) {
+      thumbUrl = req.files.file[0].thumbnailUrl;
     }
 
     const result = await db.query(
@@ -126,11 +132,15 @@ exports.update = async (req, res, next) => {
     if (is_published !== undefined) { updates.push(`is_published = $${paramIndex++}`); values.push(is_published); }
     if (req.files?.thumbnail) {
       updates.push(`thumbnail = $${paramIndex++}`);
-      values.push(req.files.thumbnail[0].path);
+      values.push(req.files.thumbnail[0].cloudinaryUrl);
     }
     if (req.files?.file) {
       updates.push(`file_url = $${paramIndex++}`);
-      values.push(req.files.file[0].path);
+      values.push(req.files.file[0].cloudinaryUrl);
+      if (!req.files?.thumbnail && req.files.file[0]?.thumbnailUrl) {
+        updates.push(`thumbnail = $${paramIndex++}`);
+        values.push(req.files.file[0].thumbnailUrl);
+      }
     }
 
     if (updates.length === 0) {
@@ -182,4 +192,37 @@ exports.getCategories = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+exports.proxyFile = async (req, res, next) => {
+  try {
+    const { url, name } = req.query;
+    if (!url) return res.status(400).json({ error: 'URL parameter required' });
+
+    const http = require(url.startsWith('https') ? 'https' : 'http');
+    const parsedUrl = new URL(url);
+
+    const options = {
+      hostname: parsedUrl.hostname,
+      path: parsedUrl.pathname + parsedUrl.search,
+      method: 'GET',
+      headers: { 'User-Agent': 'SiteVideo-Proxy/1.0' }
+    };
+
+    let ext = path.extname(parsedUrl.pathname).toLowerCase();
+    if (!ext && name) ext = path.extname(name).toLowerCase();
+
+    const mimeTypes = { '.pdf': 'application/pdf', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp', '.mp4': 'video/mp4', '.mp3': 'audio/mpeg' };
+    const contentType = mimeTypes[ext] || 'application/pdf';
+
+    const filename = name || `document${ext || '.pdf'}`;
+
+    const proxyReq = http.request(options, (proxyRes) => {
+      res.set({ 'Content-Type': contentType, 'Content-Disposition': `inline; filename="${filename}"`, 'Access-Control-Allow-Origin': '*' });
+      proxyRes.pipe(res);
+    });
+
+    proxyReq.on('error', (err) => { console.error('Proxy error:', err); res.status(502).json({ error: 'Failed to fetch file' }); });
+    proxyReq.end();
+  } catch (error) { next(error); }
 };

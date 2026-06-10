@@ -6,8 +6,18 @@ import toast from 'react-hot-toast';
 import { FiPlay, FiFileText, FiMusic, FiLock, FiUnlock, FiDownload, FiArrowLeft, FiEye, FiAlertTriangle, FiYoutube, FiBookOpen, FiClock, FiShare2, FiChevronRight, FiUsers, FiStar } from 'react-icons/fi';
 import ContentCard from '../components/ContentCard';
 
-const BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
-const toAbsUrl = (url) => url?.startsWith('http') ? url : `${BASE_URL}${url}`;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const toAbsUrl = (url) => url?.startsWith('http') ? url : url;
+const viewUrl = (url, name) => {
+  if (!url) return null;
+  if (url.startsWith('http')) {
+    let proxyUrl = `${API_URL}/contents/proxy/file?url=${encodeURIComponent(url)}`;
+    if (name) proxyUrl += `&name=${encodeURIComponent(name)}`;
+    return proxyUrl;
+  }
+  return url;
+};
+const downloadUrl = (url) => toAbsUrl(url);
 
 const typeConfig = {
   video: { icon: FiPlay, label: 'Vidéo', color: 'badge-info', emoji: '🎬', gradient: 'from-blue-600 to-blue-800' },
@@ -76,7 +86,7 @@ export default function ContentDetail() {
 
   const Icon = typeConfig[content.type]?.icon || FiPlay;
   const canAccess = hasAccess || content.status === 'free';
-  const fileUrl = content.file_url ? toAbsUrl(content.file_url) : null;
+  const fileUrl = content.file_url ? viewUrl(content.file_url, content.title) : null;
   const typeConf = typeConfig[content.type] || typeConfig.video;
   const hasThumb = !!content.thumbnail;
 
@@ -141,7 +151,7 @@ export default function ContentDetail() {
                     canAccess ? (
                       <>
                         <button onClick={handleRead} className="btn btn-primary gap-2 flex-1"><FiBookOpen size={16} /> Consulter</button>
-                        <a href={fileUrl} download className="btn btn-success gap-2 flex-1"><FiDownload size={16} /> Télécharger</a>
+                        <a href={downloadUrl(content.file_url)} target="_blank" rel="noopener noreferrer" className="btn btn-success gap-2 flex-1"><FiDownload size={16} /> Télécharger</a>
                       </>
                     ) : (
                       <>
@@ -367,7 +377,7 @@ export default function ContentDetail() {
                     {content.type === 'document' && fileUrl && (
                       <>
                         <button onClick={handleRead} className="btn btn-primary w-full gap-2"><FiBookOpen size={16} /> Lire le document</button>
-                        <a href={fileUrl} download className="btn btn-outline w-full gap-2"><FiDownload size={16} /> Télécharger</a>
+                        <a href={downloadUrl(content.file_url)} target="_blank" rel="noopener noreferrer" className="btn btn-outline w-full gap-2"><FiDownload size={16} /> Télécharger</a>
                       </>
                     )}
                     {content.type === 'audio' && (

@@ -83,4 +83,42 @@ export const contactAPI = {
   send: (data) => api.post('/contact', data)
 };
 
+export const courseAPI = {
+  getAll: (params) => api.get('/courses', { params }),
+  getBySlug: (slug) => api.get(`/courses/${slug}`),
+  getLessons: (slug) => api.get(`/courses/${slug}/lessons`),
+  getQuiz: (slug, lessonId) => api.get(`/courses/${slug}/quiz/${lessonId}`),
+  submitQuiz: (quizId, answer) => api.post(`/courses/quiz/${quizId}/attempt`, { answer }),
+  getForumTopics: (slug, params) => api.get(`/courses/${slug}/forum`, { params }),
+  createForumTopic: (slug, data) => api.post(`/courses/${slug}/forum`, data),
+  getTopicReplies: (topicId) => api.get(`/courses/forum/${topicId}/replies`),
+  createReply: (topicId, content) => api.post(`/courses/forum/${topicId}/reply`, { content }),
+  enroll: (slug) => api.post(`/courses/${slug}/enroll`),
+  getEnrollment: (slug) => api.get(`/courses/${slug}/enrollment`),
+  completeLesson: (slug, lessonId) => api.post(`/courses/${slug}/lessons/${lessonId}/complete`),
+  getCertificate: (slug) => api.get(`/courses/${slug}/certificate`)
+};
+
+export const adminCourseAPI = {
+  getAll: (params) => api.get('/admin/courses', { params }),
+  create: (data) => api.post('/admin/courses', data),
+  update: (id, data) => api.put(`/admin/courses/${id}`, data),
+  delete: (id) => api.delete(`/admin/courses/${id}`),
+  getLessons: (courseId) => api.get(`/admin/courses/${courseId}/lessons`),
+  createLesson: (courseId, data) => api.post(`/admin/courses/${courseId}/lessons`, data),
+  updateLesson: (id, data) => api.put(`/admin/lessons/${id}`, data),
+  deleteLesson: (id) => api.delete(`/admin/lessons/${id}`),
+  getQuiz: (lessonId) => api.get(`/admin/lessons/${lessonId}/quiz`),
+  addQuiz: (lessonId, data) => api.post(`/admin/lessons/${lessonId}/quiz`, data),
+  updateQuiz: (id, data) => api.put(`/admin/quiz/${id}`, data),
+  deleteQuiz: (id) => api.delete(`/admin/quiz/${id}`),
+  getForum: (params) => api.get('/admin/forum', { params }),
+  deleteForumTopic: (id) => api.delete(`/admin/forum/${id}`),
+  pinTopic: (id) => api.put(`/admin/forum/${id}/pin`),
+  getEnrollments: (courseId, params) => api.get(`/admin/courses/${courseId}/enrollments`, { params }),
+  getCertificates: (params) => api.get('/admin/certificates', { params }),
+  getCourseQuizzes: (courseId) => api.get(`/admin/courses/${courseId}/quizzes`),
+  generateQuiz: (lessonId, data) => api.post(`/admin/lessons/${lessonId}/generate-quiz`, data)
+};
+
 export default api;

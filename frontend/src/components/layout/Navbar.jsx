@@ -2,11 +2,12 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+import LogoSvg from '../ui/LogoSvg'
 import toast from 'react-hot-toast'
 import {
   FiHome, FiGrid, FiBook, FiShield, FiSun, FiMoon, FiUser, FiLogOut,
   FiMenu, FiX, FiChevronDown, FiChevronRight, FiPlay, FiFileText,
-  FiMusic, FiStar, FiArrowRight, FiMonitor, FiMail, FiMessageSquare
+  FiMusic, FiStar, FiArrowRight, FiMail, FiMessageSquare, FiCode
 } from 'react-icons/fi'
 
 const contentTypes = [
@@ -94,9 +95,7 @@ export default function Navbar() {
               {mobileOpen ? <FiX size={20} /> : <FiMenu size={20} />}
             </button>
             <Link to="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow-md group-hover:shadow-lg transition-all">
-                <FiMonitor size={18} />
-              </div>
+              <LogoSvg size={36} className="shadow-md group-hover:shadow-lg transition-all" />
               <span className="font-bold text-xl hidden sm:block">
                 <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SavoirBox</span>
               </span>
@@ -150,6 +149,7 @@ export default function Navbar() {
               )}
             </div>
 
+            {navLink('/cours-python', 'Cours Python', <FiCode size={16} />)}
             {user && navLink('/library', 'Bibliothèque', <FiBook size={16} />)}
             {navLink('/temoignages', 'Témoignages', <FiStar size={16} />)}
             {navLink('/contact', 'Contact', <FiMail size={16} />)}
@@ -255,9 +255,7 @@ export default function Navbar() {
         <div className="p-4 border-b border-base-200">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white shadow-md">
-                <FiMonitor size={18} />
-              </div>
+              <LogoSvg size={36} className="shadow-md" />
               <span className="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">SavoirBox</span>
             </Link>
             <button onClick={() => setMobileOpen(false)} className="p-2 rounded-lg hover:bg-base-200 transition-colors">
@@ -272,12 +270,13 @@ export default function Navbar() {
             <div>
               <p className="text-xs font-semibold text-base-content/40 uppercase tracking-widest mb-2 px-2">Navigation</p>
               <div className="space-y-0.5">
-                {[
-                  { to: '/', label: 'Accueil', icon: FiHome },
-                  { to: '/catalog', label: 'Catalogue', icon: FiGrid },
-                  { to: '/temoignages', label: 'Témoignages', icon: FiStar },
-                  { to: '/contact', label: 'Contact', icon: FiMail },
-                ].map(l => (
+                  {[
+                    { to: '/', label: 'Accueil', icon: FiHome },
+                    { to: '/catalog', label: 'Catalogue', icon: FiGrid },
+                    { to: '/cours-python', label: 'Cours Python', icon: FiCode },
+                    { to: '/temoignages', label: 'Témoignages', icon: FiStar },
+                    { to: '/contact', label: 'Contact', icon: FiMail },
+                  ].map(l => (
                   <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                       isActive(l.to) ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-base-200'

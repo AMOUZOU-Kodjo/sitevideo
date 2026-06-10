@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { adminAPI } from '../../services/api';
 import {
   FiUsers, FiFilm, FiShoppingCart, FiDollarSign, FiTrendingUp,
-  FiArrowUp, FiArrowDown, FiEye, FiDownload, FiPlay, FiFileText, FiMusic
+  FiArrowUp, FiArrowDown, FiEye, FiDownload, FiPlay, FiFileText, FiMusic,
+  FiBookOpen, FiCode, FiAward
 } from 'react-icons/fi';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -155,6 +156,39 @@ export default function AdminDashboard() {
         />
       </div>
 
+      {/* Course stats */}
+      <div className="bg-base-100 rounded-2xl border border-base-200 shadow-sm p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-base flex items-center gap-2">
+            <FiCode className="text-primary" />
+            Cours Python
+          </h3>
+          <Link to="/admin/courses" className="btn btn-ghost btn-xs gap-1">Gérer <FiArrowUp size={12} className="rotate-45" /></Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="text-center p-3 rounded-xl bg-base-200/50">
+            <p className="text-2xl font-extrabold text-primary">{stats.courses?.total_courses || 0}</p>
+            <p className="text-xs text-base-content/50 mt-1">Cours</p>
+          </div>
+          <div className="text-center p-3 rounded-xl bg-base-200/50">
+            <p className="text-2xl font-extrabold text-secondary">{stats.courses?.total_lessons || 0}</p>
+            <p className="text-xs text-base-content/50 mt-1">Leçons</p>
+          </div>
+          <div className="text-center p-3 rounded-xl bg-base-200/50">
+            <p className="text-2xl font-extrabold text-accent">{stats.courses?.total_enrollments || 0}</p>
+            <p className="text-xs text-base-content/50 mt-1">Inscriptions</p>
+          </div>
+          <div className="text-center p-3 rounded-xl bg-base-200/50">
+            <p className="text-2xl font-extrabold text-success">{stats.courses?.completed_enrollments || 0}</p>
+            <p className="text-xs text-base-content/50 mt-1">Terminés</p>
+          </div>
+          <div className="text-center p-3 rounded-xl bg-base-200/50">
+            <p className="text-2xl font-extrabold text-warning">{stats.courses?.total_certificates || 0}</p>
+            <p className="text-xs text-base-content/50 mt-1">Certificats</p>
+          </div>
+        </div>
+      </div>
+
       {/* Charts row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -283,7 +317,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Bottom row — Top content + Recent users */}
+      {/* Bottom row — Top content + Recent users + Enrollments + Certificates */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Top contents */}
@@ -359,6 +393,67 @@ export default function AdminDashboard() {
               <div className="text-center py-8 text-base-content/30 text-sm">Aucun utilisateur</div>
             )}
             <Link to="/admin/users" className="btn btn-ghost btn-sm w-full mt-2 gap-1">Voir tous les utilisateurs →</Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 2 — Recent enrollments + Certificates */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent enrollments */}
+        <div className="card bg-base-100 rounded-2xl shadow-sm border border-base-200">
+          <div className="card-body p-5">
+            <h3 className="font-bold text-base flex items-center gap-2 mb-4">
+              <FiBookOpen size={16} className="text-secondary" />
+              Dernières inscriptions aux cours
+            </h3>
+            {stats.recentEnrollments?.length > 0 ? (
+              <div className="space-y-2">
+                {stats.recentEnrollments.map((e, i) => (
+                  <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-base-200/50 transition-colors">
+                    <span className="w-7 h-7 rounded-lg bg-base-300 flex items-center justify-center text-xs font-bold text-base-content/50">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{e.user_name}</p>
+                      <p className="text-xs text-base-content/40 truncate">{e.course_title}</p>
+                    </div>
+                    <span className={`badge badge-xs ${e.status === 'completed' ? 'badge-success' : 'badge-ghost'}`}>
+                      {e.status === 'completed' ? 'Terminé' : 'En cours'}
+                    </span>
+                    <span className="text-xs text-base-content/30">{new Date(e.started_at).toLocaleDateString('fr-FR')}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-base-content/30 text-sm">Aucune inscription</div>
+            )}
+            <Link to="/admin/courses" className="btn btn-ghost btn-sm w-full mt-2 gap-1">Voir les cours →</Link>
+          </div>
+        </div>
+
+        {/* Recent certificates */}
+        <div className="card bg-base-100 rounded-2xl shadow-sm border border-base-200">
+          <div className="card-body p-5">
+            <h3 className="font-bold text-base flex items-center gap-2 mb-4">
+              <FiAward size={16} className="text-warning" />
+              Derniers certificats délivrés
+            </h3>
+            {stats.recentCertificates?.length > 0 ? (
+              <div className="space-y-2">
+                {stats.recentCertificates.map((c, i) => (
+                  <div key={c.id} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-base-200/50 transition-colors">
+                    <span className="w-7 h-7 rounded-lg bg-warning/10 flex items-center justify-center text-xs font-bold text-warning">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{c.user_name}</p>
+                      <p className="text-xs text-base-content/40 truncate">{c.course_title}</p>
+                    </div>
+                    {c.certificate_id && <span className="text-[10px] text-base-content/20 font-mono">{c.certificate_id.slice(0, 16)}...</span>}
+                    <span className="text-xs text-base-content/30">{new Date(c.issued_at).toLocaleDateString('fr-FR')}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-base-content/30 text-sm">Aucun certificat</div>
+            )}
+            <Link to="/admin/certificates" className="btn btn-ghost btn-sm w-full mt-2 gap-1">Voir les certificats →</Link>
           </div>
         </div>
       </div>
